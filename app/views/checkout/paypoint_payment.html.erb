@@ -1,0 +1,71 @@
+<% pm=@order.payment_method
+    options={
+            :ssl_cb=>false,
+            :mail_customer=>pm.preferred_mail_customer,
+            :mail_attach_customer=>pm.preferred_mail_attach_customer,
+            :mail_attach_merchant=>pm.preferred_mail_attach_merchant,
+            :req_cv2=>pm.preferred_req_cv2,
+            :test_status=>Rails.env==:production ? "live" : "true",
+            :show_back=>"submit",
+            :md_flds=>'trans_id:amount',
+            :dups=>Rails.env==:production,
+            :cb_flds=>'return_url:payment_method_id',
+            :return_url=>u(order_url(@order)),
+            :payment_method_id=>pm.id
+
+    }
+   options_array=[]
+   options.each_pair do |k,v|
+       options_array << "#{k}=#{v}"
+   end
+   order_details=[]
+   @order.line_items.each do |line|
+        order_details << "prod=#{line.product.name.gsub(/;|,|=/,' ')},item_amount=#{line.product.price}x#{line.quantity}"
+   end
+
+%>
+
+<% payment_service_for @order.number, @order.payment_method.preferred_merchant,
+                       :amount   => @order.total,
+                       :currency => @order.payment_method.preferred_currency_code,
+                       :service  => :paypoint,
+                       :html     => {:id => 'payment-form'} do |service| %>
+    <% service.notify_url paypoint_notify_url %>
+    <% service.cancel_return_url checkout_url %>
+    <% service.customer "#{@order.bill_address.firstname} #{@order.bill_address.lastname}" %>
+    <% service.options options_array.join(',') %>
+    <% service.billing_name  "#{@order.bill_address.firstname} #{@order.bill_address.lastname}"%>
+    <% service.billing_tel @order.bill_address.phone %>
+    <% service.billing_email @order.email %>
+    <% service.billing_address :city     => @order.bill_address.city,
+                               :address1 => @order.bill_address.address1,
+                               :address2 => @order.bill_address.address2,
+                               :state    => @order.bill_address.state ? @order.bill_address.state.name : @order.bill_address.state_name,
+                               :country  => @order.bill_address.country.name,
+                               :zip      => @order.bill_address.zipcode %>
+    <% service.shipping_name  "#{@order.ship_address.firstname} #{@order.ship_address.lastname}"%>
+    <% service.shipping_tel @order.ship_address.phone %>
+    <% service.shipping_email @order.email %>
+    <% service.shipping_address :city     => @order.ship_address.city,
+                               :address1 => @order.ship_address.address1,
+                               :address2 => @order.ship_address.address2,
+                               :state    => @order.ship_address.state ? @order.ship_address.state.name : @order.ship_address.state_name,
+                               :country  => @order.ship_address.country.name,
+                               :zip      => @order.ship_address.zipcode %>
+    <% service.presentation_options :template=>pm.preferred_template,
+                                    :background_color=>pm.preferred_background_color,
+                                    :background_image=>pm.preferred_background_image,
+                                    :branding=>pm.preferred_branding,
+                                    :font_color=>pm.preferred_font_color,
+                                    :font_size=>pm.preferred_font_size,
+                                    :font_face=>pm.preferred_font_face
+    %>
+    <% service.mail_subject pm.preferred_mail_subject %>
+    <% service.order_lines order_details.join(';') %>
+    <% service.digest Digest::MD5.hexdigest("#{@order.number}#{@order.total}#{pm.preferred_password}") %>
+
+    <input type="submit" name="submit" value="submit">
+    
+<% end %>
+
+
