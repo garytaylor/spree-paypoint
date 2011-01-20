@@ -31,7 +31,7 @@
                        :service  => :paypoint,
                        :html     => {:id => 'payment-form'} do |service| %>
     <% service.notify_url paypoint_notify_url %>
-    <% service.cancel_return_url checkout_url %>
+    
     <% service.customer "#{@order.bill_address.firstname} #{@order.bill_address.lastname}" %>
     <% service.options options_array.join(',') %>
     <% service.billing_name  "#{@order.bill_address.firstname} #{@order.bill_address.lastname}"%>
