@@ -10,8 +10,7 @@
             :md_flds=>'trans_id:amount',
             :dups=>Rails.env==:production,
             :cb_flds=>'return_url:payment_method_id',
-            :return_url=>u(order_url(@order)),
-            :payment_method_id=>pm.id
+            :return_url=>u(order_url(@order))
 
     }
    options_array=[]
@@ -30,7 +29,7 @@
                        :currency => @order.payment_method.preferred_currency_code,
                        :service  => :paypoint,
                        :html     => {:id => 'payment-form'} do |service| %>
-    <% service.notify_url paypoint_notify_url %>
+    <% service.notify_url paypoint_notify_url(:payment_method_id=>pm.id) %>
     
     <% service.customer "#{@order.bill_address.firstname} #{@order.bill_address.lastname}" %>
     <% service.options options_array.join(',') %>

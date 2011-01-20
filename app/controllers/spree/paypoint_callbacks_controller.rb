@@ -1,5 +1,6 @@
 module Spree
   class PaypointCallbacksController < ::ActionController::Base
+    protect_from_forgery :except=>:notify
     #Called by paypoint when the payment is paid, but all security measures must be taken as this could easily be spoofed
     def notify
       payment_method=PaymentMethod.find_by_id(params[:payment_method_id])
