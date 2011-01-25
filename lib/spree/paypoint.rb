@@ -354,6 +354,7 @@ module Spree::Paypoint
 
   def redirect_to_paypoint_form
     return true unless @order.state=="confirm" and @order.payment_method.is_a?(BillingIntegration::Paypoint)
+    @order.payment.started_processing
     redirect_to paypoint_payment_order_checkout_url(@order, :payment_method_id => @order.payment_method.id)
   end
 end

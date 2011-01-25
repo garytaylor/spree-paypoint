@@ -67,7 +67,11 @@ module ActiveMerchant #:nodoc:
           #P:# Pre-bank checks. No MD5 hash / token key set up against account
 
           def status
-            params['code']
+            case params['code']
+              when 'A' then 'Completed'
+              else 'Failed'
+            end
+
           end
 
           # Id of this transaction (same as the order number I think)
