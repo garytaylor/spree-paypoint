@@ -5,7 +5,7 @@
             :mail_attach_customer=>pm.preferred_mail_attach_customer,
             :mail_attach_merchant=>pm.preferred_mail_attach_merchant,
             :req_cv2=>pm.preferred_req_cv2,
-            :test_status=>Rails.env==:production ? "live" : "true",
+            :test_status=>Rails.env=='production' ? "live" : "true",
             :show_back=>"submit",
             :md_flds=>'trans_id:amount',
             :dups=>Rails.env==:production,
