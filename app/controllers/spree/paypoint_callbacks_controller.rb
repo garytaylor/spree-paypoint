@@ -13,7 +13,7 @@ module Spree
         Rails.logger.warn "Warning:: Attempt at spoofind the paypoint callback from #{request.ip}" unless n.from_paypoint?
         if n.from_paypoint? and n.complete? and n.amount.to_f==@order.total.to_f
           p=@order.payment
-          p.complete
+          p.complete unless p.nil?  #Not 100% sure if we need to do this anymore - think everything is dealt with my @order.finalize!
           @order.state='complete'
           @order.finalize!
         else
