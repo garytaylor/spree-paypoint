@@ -1,5 +1,5 @@
 Rails.application.routes.draw do |map|
-  map.resources :orders do |order|
+  map.resources :orders, :member=>{:thank_you=>:get} do |order|
     order.resource :checkout, :controller=>"checkout", :member => {:paypoint_checkout => :any, :paypoint_payment => :any, :paypoint_confirm => :any, :paypoint_finish => :any}
   end
 
